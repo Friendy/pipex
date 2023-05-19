@@ -1,5 +1,5 @@
 NAME = pipex
-SRCS = pipex.c find_path.c get_args.c utils.c
+SRCS = pipex.c find_path.c get_args.c utils.c err_handler.c
 LIBFT_A = libft/libft.a
 FLAGS = -Werror -Wall -Wextra
 OBJS = $(SRCS:.c=.o)

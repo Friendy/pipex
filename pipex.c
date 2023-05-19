@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:48 by mrubina           #+#    #+#             */
-/*   Updated: 2023/05/14 18:58:34 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/05/19 01:51:58 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,141 +50,138 @@ static void build_pipe(int *pipefd, char *infile, char *outfile)
 	dup2(pipefd[0], 1);// output to file
 }
 
-static void error_handler(int type, char *name)
-{
-	if (type == 6)
-		ft_printf("Error: wrong number of arguments");
-	if (type == ENOENT)
-	{	perror(ft_strjoin("./pipex: ", name));
-	//perror("No access to the file ");
-	//ft_printf("%s: %s: %s\n", "./pipex", strerror(type), name);
-	}
-		//ft_printf("%s", name);}
-		//perror("No access to the file ");
-	if (type == 1)
-		perror("Could not create pipe");
-	if (type == 3)
-		perror("Could not duplicate process");
-	if (type == 127)
-		perror(strerror(127));
-		//perror(ft_strjoin("Could not execute ", name));	
-	exit(type);
+void checkLeaks() {
+	system("leaks pipex");
 }
-/* static void error_handler(int type, char *name)
-{
-	if (type == 6)
-		ft_printf("Error: wrong number of arguments");
-	if (type == 1)
-		perror("");
-	if (type == 2)
-		perror("");
-	if (type == 3)
-		perror("");
-	if (type == 4)
-		perror("");
-	exit(1);
-} */
 
 int	main(int argc, char *argv[], char *envp[])
 {
-	int	i;
 	char **cmd_args;
 	char *cmd_path;
 	pid_t id1;
+	//pid_t id1;
 	int pipefd[2];
-	int in;
-	int out;
-	char *buf;
+	int filefd;
+	int filefd1;
+	int *ex_stat;
+	int stat;
+	int stat2;
+	int *map;
 	
-	i = 0;
-	//strerror(127)
-	//buf = ft_strdup("tesl t tytyt tyt");
-	//rm_char(buf, ' ');
-	//printf("%s\n", strerror(2));
-	//2 - no file or dir
-	//exit(0);
-	//arr_info(argv);
-	//info_to_file(envp, "env_info");
+	//atexit(checkLeaks);
+	*ex_stat = 0;
+	//map = rm_char(cmd_path, cmd_path + 8, 't');
+	//printf("%i", map[1]);
+
 	if (argc != 5)
-		error_handler(6, "");
-	if (access(argv[4], R_OK) == 0)
-		unlink(argv[4]);
-	
-	//arr_info(envp);
-	
-		//
+		error_handler(6, "", ex_stat);
+	//if (access(argv[4], R_OK) == 0)
+	//	unlink(argv[4]);
+	filefd = open(argv[1], O_RDONLY);
+	if (filefd < 0)
+	//else
+	{
 		
-	//printf("ttt");
-	if (access(argv[1], R_OK) == 0)
-		in = open(argv[1], O_RDONLY);
-	else
-		error_handler(ENOENT, argv[1]);
+		error_handler(ENOENT, argv[1], ex_stat);
+		
+		filefd = open("/dev/null", O_RDONLY);
+	}
 	//in = open(find_path(argv[1], envp, R_OK), O_RDONLY);
-	i = dup2(in, 0);//using file as input
+	if (dup2(filefd, 0)== -1)//using file as input
+		error_handler(200, "", ex_stat);
 	if (pipe(pipefd) == -1)
-		error_handler(1, "");
+		error_handler(1, "", ex_stat);
 	id1 = fork();
+	//if (id1 != 0)
+	//	int_to_file(errno, "ex", 2, 'a');
+	
 	if (id1 == -1)//child  we write
-		error_handler(3, "");
+		error_handler(3, "", ex_stat);	
 	else if (id1 == 0)//child  we write
 	{
-		//arr_info(envp);
-		//printf("end");
+		if (*ex_stat == 2)
+			return (1);
+		//int_to_file(errno, "ex", 2, 'a');
+		//close(filefd);
 		close(pipefd[0]);//close read end
+		//int_to_file(errno, "ex", 13, 'a');
 		cmd_args = get_args(argv[2]);//program name is as input
+		//str_to_file(argv[2], "/Users/mrubina/projects/pipex/tt", 1, 'a');
+		//str_to_file(cmd_args[0], "/Users/mrubina/projects/pipex/tt", 2, 'a');
+		//int_to_file(errno, "ex", 10, 'a');
 		cmd_path = find_path(*cmd_args, envp, X_OK);
-		i = dup2(pipefd[1], 1);
+		//if (ft_strchr(name, '\\') == 0)
 		
-		
-		
-			//if (access(find_path(argv[1], envp), R_OK) != 0)
-			//error_handler(ENOENT, argv[1]);
-		//get_var("VAR1", "vars", 1);
-		//get_var("VAR2", "vars", 'a');	
-		//cmd_args	
-			//ft_printf("%s: %s: %s\n", "./pipex", strerror(ENOENT), argv[1]);
-		if (execve(cmd_path, cmd_args, envp) == -1) //we use in as input output goes to pipefd[1] and to pipefd[0]
-			error_handler(127, cmd_path);
-		return (0);
-	}	
+		dup2(pipefd[1], 1);
+		//int_to_file(*ex_stat, "ex", 3, 'a');
+		str_to_file(cmd_path, "/Users/mrubina/projects/pipex/tt", 1, 'a');
+		if (ft_strchr(cmd_path, '/') == 0 || execve(cmd_path, cmd_args, envp) == -1) //we use in as input output goes to pipefd[1] and to pipefd[0]
+			error_handler(300, cmd_path, ex_stat);
+		int_to_file(*ex_stat, "ex", 333, 'a');
+		return (*ex_stat);
+	}
 	else//parent we read
 	{
-		close(in);
+		//exit(0);
+		//if (id1 != 0)
+		//	int_to_file(errno, "ex", 4, 'a');
+		close(filefd);
 		close(pipefd[1]);
-		//i = wait(0);
-		
-		out = open(argv[4], O_CREAT | O_WRONLY, 0644);//open file we read from
-	
-		//free(cmd_path);
-		//free(cmd_args);
-	
-		//unlink(argv[4]);
-		
-		//i = dup2(pipefd[1], 1); // write output to pipe
-		
-		i = dup2(pipefd[0], 0);
-		i = dup2(out, 1);
+		if (access(argv[4], W_OK) == -1 && errno != ENOENT)
+			error_handler(13, argv[4], ex_stat);
+		else if (access(argv[4], F_OK) == 0)
+			unlink(argv[4]);
+		filefd = open(argv[4], O_CREAT | O_WRONLY, 0644);//open file we read from
+		if (filefd < 0)
+			error_handler(3, "", ex_stat);
+		dup2(pipefd[0], 0);
+		dup2(filefd, 1);
 		id1 = fork();
 		if (id1 == -1)//child  we write
-			error_handler(3, "");
+			error_handler(3, "", ex_stat);
 		else if (id1 == 0)//child  we write
 		{
 			cmd_args = get_args(argv[3]);//program name is as input
+			//str_to_file(cmd_args[1], "/Users/mrubina/projects/pipex/tt", 1, 'a');
 			cmd_path = find_path(*cmd_args, envp, X_OK);
-			info_to_file(cmd_args, "args");
-			if (execve(cmd_path, cmd_args, envp) == -1) //we use in as input output goes to pipefd[1] and to pipefd[0]
-				error_handler(4, cmd_path);
+			str_to_file(cmd_path, "/Users/mrubina/projects/pipex/tt", 1, 'a');
+			//info_to_file(cmd_args, "args");
+			if (ft_strchr(cmd_path, '/') == 0 || execve(cmd_path, cmd_args, envp) == -1) //we use in as input output goes to pipefd[1] and to pipefd[0]
+				error_handler(300, cmd_path, ex_stat);
 			//write_to_pipe(cmd_path, cmd_args, envp);
 			//return(0);
+			//int_to_file(ex_stat, "ex", 4, 'a');
+			//errno = ex_stat;
+			//int_to_file(errno, "ex", 5, 'a');
+			int_to_file(*ex_stat, "/Users/mrubina/projects/pipex/ex", 222, 'a');
+			exit(*ex_stat);
+			
 		}	
 		else//parent we read
 		{
-			close(pipefd[1]);
-			i = wait(0);
-			close(out);
-			return (0);
+			//wait(&stat);
+			//wait(&stat);
+			//waitpid(id1, &stat, 0);
+			waitpid(id1, &stat2, 0);
+			
+			//close(pipefd[1]);
+			//int_to_file(errno, "ex", 4, 'a');
+			//waitpid(id1, &stat, 0);
+			int_to_file(WEXITSTATUS(stat), "/Users/mrubina/projects/pipex/ex", id1, 'a');
+			//waitpid(id1, &stat, 0);
+			int_to_file(WEXITSTATUS(stat2), "/Users/mrubina/projects/pipex/ex", id1, 'a');
+			//wait(ex_stat);
+			//
+			close(filefd);
+			//if (WIFEXITED(stat))
+			return (WEXITSTATUS(stat2));
+			//else
+			//	return (WEXITSTATUS(stat));
+			//int_to_file(*ex_stat, "/Users/mrubina/projects/pipex/ex", 100, 'a');
+			//return (0);
 		}
 		return (0);
 	}
+	
 	return (0);
 }
