@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/05/20 17:18:46 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/05/20 21:28:52 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,15 @@ static char	*last_quote(char *str, char c)
 	return (str - 1);
 }
 
+static char	*trim_replace(char *str, char c)
+{
+	char	*new_str;
+
+	new_str = ft_strtrim(str, (const char *)&c);
+	free_str(str);
+	return (new_str);
+}
+
 static char	**split_plus(char *str)
 {
 	char	*start;
@@ -57,16 +66,16 @@ static char	**split_plus(char *str)
 	c = get_quote(str);
 	if (c == '0')
 		return (ft_split(str, ' '));
-	i = 0;
 	start = ft_strchr(str, c) + 1;
 	map = replace_char(start, last_quote(start, c), ' ', 9);
 	args = ft_split(str, ' ');
+	i = 0;
 	while (args[i] != NULL)
 	{
 		if (*(args[i]) == '\'' || *(args[i]) == '"')
 		{
 			replace_by_map(args[i] + 1, map, ' ');
-			args[i] = ft_strtrim(args[i], (const char *)&c);
+			args[i] = trim_replace(args[i], c);
 		}
 		i++;
 	}

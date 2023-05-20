@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 18:19:40 by mrubina           #+#    #+#             */
-/*   Updated: 2023/05/20 17:16:01 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/05/20 21:19:59 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 # include <malloc/malloc.h>
 # include <sys/types.h>
 # include <sys/wait.h>
-//# include "debug.h"
 
 char	*find_path(char *cand_path, char *envp[], int *status);
 char	**get_args(char *arg_str);
