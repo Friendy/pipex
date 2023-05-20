@@ -6,7 +6,7 @@
 #    By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/10/13 19:18:45 by mrubina           #+#    #+#              #
-#    Updated: 2023/04/30 17:30:40 by mrubina          ###   ########.fr        #
+#    Updated: 2023/05/19 22:22:02 by mrubina          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,29 +19,20 @@ SRCS = ft_atoi.c ft_bzero.c ft_calloc.c ft_isalnum.c ft_isalpha.c \
 	ft_strlcpy.c ft_strlen.c ft_strmapi.c ft_strncmp.c ft_strnstr.c \
 	ft_strrchr.c ft_strtrim.c ft_substr.c ft_tolower.c ft_toupper.c\
 	ft_lstclear_bonus.c ft_lstdelone_bonus.c ft_lstlast_bonus.c ft_lstnew_bonus.c ft_lstsize_bonus.c \
-	ft_lstiter_bonus.c ft_lstmap_bonus.c ft_lstadd_back_bonus.c ft_lstadd_front_bonus.c\
-	get_next_line.c get_next_line_utils.c ft_printf.c
-#SRCS_PRINTF = 
-#align_params.c extract_params.c utils.c variants.c width.c
-SRCS_PRINTF_U =  print_arg.c \
-shortcuts.c convert_to_hex.c convert.c int_putnbr.c int_put.c get_arg.c
+	ft_lstiter_bonus.c ft_lstmap_bonus.c ft_lstadd_back_bonus.c ft_lstadd_front_bonus.c
 OBJS = $(SRCS:.c=.o)
-OBJS_PRINTF_U = $(SRCS_PRINTF_U:.c=.o)
 FLAGS  = -Wall -Werror -Wextra
 
-all:$(NAME)
+all: $(NAME)
 
-$(NAME): $(OBJS_PRINTF_U) $(OBJS)
-	ar rc $(NAME) $(OBJS) $(OBJS_PRINTF_U)
+$(NAME): $(OBJS)
+	ar rc $(NAME) $(OBJS)
 
 $(OBJS):
 	cc $(FLAGS) -c $(SRCS)
 
-$(OBJS_PRINTF_U):
-	cc $(FLAGS) -c $(addprefix printf_utils/, $(SRCS_PRINTF_U))
-
 clean:
-	rm -f $(OBJS) $(OBJS_PRINTF_U)
+	rm -f $(OBJS)
 
 fclean: clean
 	rm -f $(NAME)

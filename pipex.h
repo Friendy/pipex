@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 18:19:40 by mrubina           #+#    #+#             */
-/*   Updated: 2023/05/18 19:35:21 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/05/20 17:16:01 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,16 @@
 # include <errno.h>
 # include <string.h>
 # include <malloc/malloc.h>
-# include "utils.h"
-#include <sys/types.h>
-#include <sys/wait.h>
-char	*find_path(char *cand_path, char *envp[], int t);
+# include <sys/types.h>
+# include <sys/wait.h>
+//# include "debug.h"
+
+char	*find_path(char *cand_path, char *envp[], int *status);
 char	**get_args(char *arg_str);
-void str_rotate(char *str);
-void str_rotate1(char *str, char *str_end);
-void error_handler(int type, char *name, int *exit_stat);
-int *rm_char(char *str, char *str_end, char c);
+char	*replace_char(char *str, char *str_end, char old_c, char new_c);
+void	replace_by_map(char *str, char *map, char c);
+void	free_arr(char **arr);
+void	error_handler(int type, char *name, int *exit_stat);
+char	*extract_path(char *path_str, char *name);
+void	free_str(char *s);
 #endif

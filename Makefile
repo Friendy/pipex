@@ -10,7 +10,7 @@ $(NAME): $(LIBFT_A) $(OBJS)
 	cc -o $(NAME) $(OBJS) -Llibft -lft
 
 $(OBJS):
-	cc -c $(SRCS)
+	cc $(FLAGS) -c $(SRCS)
 
 $(LIBFT_A): make_libft
 
@@ -18,10 +18,12 @@ make_libft:
 	make -C libft
 
 clean:
-	#make fclean -C libft
+	make fclean -C libft
 	rm -f $(OBJS)
 
 fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+
+.PHONY: all clean fclean re

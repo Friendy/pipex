@@ -6,19 +6,21 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/05/18 18:24:25 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/05/20 17:15:16 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "utils.h"
+#include "pipex.h"
 
-char *replace_char(char *str, char *str_end, char old_c, char new_c)
+char	*replace_char(char *str, char *str_end, char old_c, char new_c)
 {
-	char *map;
-	int i;
-	
+	char	*map;
+	int		i;
+
 	i = 0;
 	map = malloc(str_end - str + 2);
+	if (map == NULL)
+		return (map);
 	while (str != str_end)
 	{
 		if (*str == old_c)
@@ -35,9 +37,9 @@ char *replace_char(char *str, char *str_end, char old_c, char new_c)
 	return (map);
 }
 
-void replace_by_map(char *str, char *map, char c)
+void	replace_by_map(char *str, char *map, char c)
 {
-	while (*map != '\0')
+	while (map != NULL && *map != '\0')
 	{
 		if (*map == 'c')
 			*str = c;
@@ -46,96 +48,27 @@ void replace_by_map(char *str, char *map, char c)
 	}
 }
 
-void free_arr(char **arr)
+void	free_arr(char **arr)
 {
-	char **i;
+	char	**i;
 
-	i = arr;
-	while (*i != NULL)
+	if (arr != NULL)
 	{
-		free(*i);
-		i++;	
-	}
-	free(arr);
-}
-
-
-
-void pipe_info(int *pipefd)
-{
-	printf("read end:%i (%p)\n", pipefd[0], pipefd);
-	printf("write end:%i (%p)\n", pipefd[1], (pipefd + 1));
-}
-
-void arr_info(char **arr)
-{
-	int	i;
-	
-	i = 0;
-	while (arr[i] != NULL)
-	{
-		printf("%i: %s(%p)[%p]\n", i, arr[i], arr[i], &arr[i]);
-		i++;
+		i = arr;
+		while (*i != NULL)
+		{
+			free(*i);
+			i++;
+		}
+		free(arr);
 	}
 }
 
-void info_to_file(char **arr, char  *file)
+void	free_str(char *s)
 {
-	int	i;
-	int fd;
-	static int count = 0;
-	
-	i = 0;
-	fd = open(file, O_CREAT | O_APPEND | O_WRONLY, 0644);
-	ft_putnbr_fd(count, fd);
-	while (arr[i] != NULL)
+	if (s != NULL)
 	{
-		ft_putnbr_fd(i, fd);
-		ft_putchar_fd(' ', fd);
-		ft_putendl_fd(arr[i], fd);
-		i++;
+		free(s);
+		s = NULL;
 	}
-	close(fd);
-	count = count + 1;
 }
-
-void get_var(char *var_name, char *file, int flag)
-{
-	int fd;
-	if (flag == 'a')
-		fd = open(file, O_CREAT | O_APPEND | O_WRONLY, 0644);
-	else
-		fd = open(file, O_CREAT | O_WRONLY, 0644);
-	ft_putendl_fd(getenv(var_name), fd);
-	close(fd);
-}
-
-void int_to_file(int i, char *file, int id, int flag)
-{
-	int fd;
-	
-	if (flag == 'a')
-		fd = open(file, O_CREAT | O_APPEND | O_WRONLY, 0644);
-	else
-		fd = open(file, O_CREAT | O_WRONLY, 0644);
-	ft_putnbr_fd(id, fd);
-	ft_putstr_fd(": ", fd);
-	ft_putnbr_fd(i, fd);
-	ft_putchar_fd('\n', fd);
-	close(fd);
-}
-
-void str_to_file(char *str, char *file, int id, int flag)
-{
-	int fd;
-	
-	if (flag == 'a')
-		fd = open(file, O_CREAT | O_APPEND | O_WRONLY, 0644);
-	else
-		fd = open(file, O_CREAT | O_WRONLY, 0644);
-	ft_putnbr_fd(id, fd);
-	ft_putstr_fd(": ", fd);
-	ft_putendl_fd(str, fd);
-	close(fd);
-}
-

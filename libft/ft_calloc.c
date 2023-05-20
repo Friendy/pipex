@@ -14,8 +14,9 @@
 
 void	*ft_calloc(size_t count, size_t size)
 {
-	void	*p;
-	long double product;
+	void		*p;
+	long double	product;
+
 	product = (long double) count * (long double) size;
 	if (product >= (long double)((size_t)(-1)))
 		p = 0;

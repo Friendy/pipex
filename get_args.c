@@ -6,14 +6,16 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/05/18 18:24:41 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/05/20 17:18:46 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static char get_quote(char *str)
+static char	get_quote(char *str)
 {
+	if (str == NULL)
+		return ('0');
 	if (ft_strchr(str, '"') && ft_strchr(str, '\''))
 	{
 		if (ft_strchr(str, '"') < ft_strchr(str, '\''))
@@ -29,8 +31,10 @@ static char get_quote(char *str)
 		return ('0');
 }
 
-static char *last_quote(char *str, char c)
+static char	*last_quote(char *str, char c)
 {
+	if (str == NULL)
+		return (str);
 	if (c == '\'')
 		return (ft_strchr(str, c));
 	while (str && *str != '\0')
@@ -42,14 +46,14 @@ static char *last_quote(char *str, char c)
 	return (str - 1);
 }
 
-static char **split_plus(char *str)
+static char	**split_plus(char *str)
 {
-	char *start;
-	char **args;
-	int i;
-	int c;
-	char *map;
-	
+	char	*start;
+	char	**args;
+	int		i;
+	int		c;
+	char	*map;
+
 	c = get_quote(str);
 	if (c == '0')
 		return (ft_split(str, ' '));
@@ -62,29 +66,27 @@ static char **split_plus(char *str)
 		if (*(args[i]) == '\'' || *(args[i]) == '"')
 		{
 			replace_by_map(args[i] + 1, map, ' ');
-			args[i] = ft_strtrim(args[i], (const char*)&c);
+			args[i] = ft_strtrim(args[i], (const char *)&c);
 		}
 		i++;
 	}
+	free_str(map);
 	return (args);
 }
 
-char **get_args(char *arg_str)
+char	**get_args(char *arg_s)
 {
-	char **args;
-	char len;
+	char	**args;
 
-	if (arg_str == NULL)
+	if (arg_s == NULL)
 		return (NULL);
-	if (arg_str[0] == '.' && arg_str[1] == '/')
+	if (arg_s && ft_strlen(arg_s) >= 2 && arg_s[0] == '.' && arg_s[1] == '/')
 	{
 		args = malloc(2 * sizeof(char *));
-		args[0] = arg_str;
+		args[0] = arg_s;
 		args[1] = NULL;
 		return (args);
 	}
-	args = split_plus(arg_str);
-	if (args == NULL || *args == NULL)
-		return (NULL);
+	args = split_plus(arg_s);
 	return (args);
 }
