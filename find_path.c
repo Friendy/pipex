@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/05/20 17:14:15 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/08/04 21:52:26 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,10 +66,10 @@ char	*find_path(char *fpath, char *envp[], int *status)
 	else
 		path_str = extract_path(NULL, fpath);
 	if (path_str == NULL)
-		error_handler(15, path_str, status);
+		error_handler(NULLPATH, path_str, status);
 	if ((access(path_str, X_OK) == -1 && errno == EACCES))
-		error_handler(14, path_str, status);
+		error_handler(EACCES1, path_str, status);
 	if (path_str != NULL && ft_strchr(path_str, '/') == 0)
-		error_handler(400, path_str, status);
+		error_handler(NFOUNDEX, path_str, status);
 	return (path_str);
 }
