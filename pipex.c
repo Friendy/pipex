@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:48 by mrubina           #+#    #+#             */
-/*   Updated: 2023/08/04 22:23:18 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/08/10 18:35:44 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,40 +15,30 @@
 /* ./pipex file1 cmd cmd2 file2
 */
 
-//open file, set stdin, create pipe
-static int	create_pipe(int argc, char *name, int *pipefd, int *status)
+// creates pipe and redirects file descriptor of some file
+static void	create_pipe(int *pipefd, int *filefd, int *status)
 {
-	int	fd;
-
-	*status = 0;
-	if (argc != 5)
-		error_handler(ARG, "", status);
-	fd = open(name, O_RDONLY);
-	if (fd < 0)
-	{
-		error_handler(ENOENT, name, status);
-		fd = open("/dev/null", O_RDONLY);
-		if (fd < 0)
-			error_handler(ENOENT, name, status);
-	}
-	if (dup2(fd, 0) == -1 || pipe(pipefd) == -1)
+	if (pipe(pipefd) == -1)
 		error_handler(ERR, "", status);
-	return (fd);
+	redir_close(*filefd, 0, status);
 }
 
-// parent process: close input file, close write end, open output file, 
-//redirect stdin to write end, redirect stdout to file,
-static void	redirect(int *p, int f, char *outfile, int *status)
+//opens outfile and redirects it to stdout
+//closes pipe input (because it's parent)
+//sets pipe output to stdin
+static void	redirect(int *p, char *outfile, int *status, int np)
 {
-	if (close(f) == -1 || close(p[1]) == -1)
+	int	filefd;
+
+	filefd = outopen(outfile, status);
+	if (dup2(filefd, 1) == -1)
 		error_handler(ERR, "", status);
-	if (access(outfile, W_OK) == -1 && errno == EACCES)
-		error_handler(EACCES, outfile, status);
-	else if (access(outfile, F_OK) == 0)
-		unlink(outfile);
-	f = open(outfile, O_CREAT | O_WRONLY, 0644);
-	if (f < 0 || dup2(p[0], 0) == -1 || dup2(f, 1) == -1 || close(p[0]) == -1)
-		error_handler(ERR, "", status);
+	if (np == 1)
+	{
+		if (close(p[1]) == -1)
+			error_handler(ERR, "", status);
+		redir_close(p[0], 0, status);
+	}
 }
 
 static int	child_process(char *cmd, char *envp[], int *pipefd)
@@ -70,6 +60,7 @@ static int	child_process(char *cmd, char *envp[], int *pipefd)
 	return (status);
 }
 
+//wait till the last child returns and close outfile
 static int	wait_end(int id, int *status, int fd)
 {
 	if (waitpid(id, status, 0) == -1 || close(fd) == -1)
@@ -83,16 +74,19 @@ int	main(int argc, char *argv[], char *envp[])
 	int		pipefd[2];
 	int		filefd;
 	int		status;
+	int		pipestat;
 
-	filefd = create_pipe(argc, argv[1], pipefd, &status);
-	id = fork();
-	if (id == -1)
+	filefd = inopen(argc, argv[1], &status, &pipestat);
+	create_pipe(pipefd, &filefd, &status);
+	if (pipestat == 1)
+		id = fork();
+	if (pipestat == 1 && id == -1)
 		error_handler(ERR, "", &status);
-	else if (id == 0)
+	else if (pipestat == 1 && id == 0)
 		return (child_process(argv[2], envp, pipefd));
 	else
 	{
-		redirect(pipefd, filefd, argv[4], &status);
+		redirect(pipefd, argv[4], &status, pipestat);
 		id = fork();
 		if (id == -1)
 			error_handler(ERR, "", &status);

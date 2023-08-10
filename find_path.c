@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/08/04 21:52:26 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/08/10 18:39:58 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ char	*extract_path(char *path_str, char *name)
 	return (name);
 }
 
-/* cand_path is "/dir1/dir2/file" 
+/* cand_path is "/dir1/dir2/file"
 	or "file" */
 char	*find_path(char *fpath, char *envp[], int *status)
 {
@@ -72,4 +72,38 @@ char	*find_path(char *fpath, char *envp[], int *status)
 	if (path_str != NULL && ft_strchr(path_str, '/') == 0)
 		error_handler(NFOUNDEX, path_str, status);
 	return (path_str);
+}
+
+//open input file
+int	inopen(int argc, char *name, int *status, int *pipestat)
+{
+	int	fd;
+
+	*status = 0;
+	*pipestat = 1;
+	if (argc != 5)
+		error_handler(ARG, "", status);
+	fd = open(name, O_RDONLY);
+	if (fd < 0)
+	{
+		error_handler(ENOENT, name, status);
+		fd = open("/dev/null", O_RDONLY);
+		*pipestat = 0;
+	}
+	return (fd);
+}
+
+//opens outfile
+int	outopen(char *outfile, int *status)
+{
+	int	fd;
+
+	if (access(outfile, W_OK) == -1 && errno == EACCES)
+		error_handler(EACCES, outfile, status);
+	else if (access(outfile, F_OK) == 0)
+		unlink(outfile);
+	fd = open(outfile, O_CREAT | O_WRONLY, 0644);
+	if (fd < 0)
+		error_handler(ERR, "", status);
+	return (fd);
 }

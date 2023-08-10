@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/05/20 17:15:16 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/08/10 18:49:35 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,4 +71,13 @@ void	free_str(char *s)
 		free(s);
 		s = NULL;
 	}
+}
+
+//redirecting file descriptor to stdin/stddout and closing it
+void	redir_close(int fd, int stdfd, int *status)
+{
+	if (dup2(fd, stdfd) == -1)
+		error_handler(ERR, "", status);
+	if (close(fd) == -1)
+		error_handler(ERR, "", status);
 }

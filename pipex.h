@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 18:19:40 by mrubina           #+#    #+#             */
-/*   Updated: 2023/08/04 21:51:53 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/08/10 18:38:39 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@
 # define NFOUNDEX 400
 # define EACCES1 14
 # define NULLPATH 15
-# define EACCES1 14
 
 char	*find_path(char *cand_path, char *envp[], int *status);
 char	**get_args(char *arg_str);
@@ -38,5 +37,8 @@ void	replace_by_map(char *str, char *map, char c);
 void	free_arr(char **arr);
 void	error_handler(int type, char *name, int *exit_stat);
 char	*extract_path(char *path_str, char *name);
+int		inopen(int argc, char *name, int *status, int *pipestat);
+int		outopen(char *outfile, int *status);
+void	redir_close(int fd, int stdfd, int *status);
 void	free_str(char *s);
 #endif

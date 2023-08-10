@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:48 by mrubina           #+#    #+#             */
-/*   Updated: 2023/08/04 22:22:47 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/08/07 00:37:21 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void static	print_error(char *name, char *text, int use_perr, int type)
 			t = ft_strjoin(text, name);
 			perror(t);
 			free(t);
-			if (type == NFOUND|| type == NFOUNDEX || type == EACCES1)
+			if (type == NFOUND || type == NFOUNDEX)
 				free_str(name);
 		}
 	}
@@ -59,7 +59,7 @@ void	error_handler(int type, char *name, int *exit_stat)
 	else if (type == EACCES1 || type == NULLPATH)
 	{
 		if (type == NULLPATH)
-			print_error("", strerror(13), 0, type);
+			print_error("", strerror(EACCES), 0, type);
 		else
 			print_error(name, "pipex: ", 1, type);
 		*exit_stat = 126;
