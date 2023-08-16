@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:48 by mrubina           #+#    #+#             */
-/*   Updated: 2023/08/10 18:35:44 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/08/15 22:47:53 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,10 @@
 */
 
 // creates pipe and redirects file descriptor of some file
-static void	create_pipe(int *pipefd, int *filefd, int *status)
+static void	create_pipe(int *pipefd, int *status)
 {
 	if (pipe(pipefd) == -1)
 		error_handler(ERR, "", status);
-	redir_close(*filefd, 0, status);
 }
 
 //opens outfile and redirects it to stdout
@@ -40,6 +39,17 @@ static void	redirect(int *p, char *outfile, int *status, int np)
 		redir_close(p[0], 0, status);
 	}
 }
+
+/* void check_args(int argc, char *arg1, int *pipestat, int *status)
+{
+	*status = 0;
+	if (argc == 6 && strcmp(arg1, "here_doc") == 0)
+		*pipestat = 2;
+	else if (argc != 5)
+		*pipestat = 1;
+	else
+		error_handler(ARG, "", status);
+} */
 
 static int	child_process(char *cmd, char *envp[], int *pipefd)
 {
@@ -77,10 +87,12 @@ int	main(int argc, char *argv[], char *envp[])
 	int		pipestat;
 
 	filefd = inopen(argc, argv[1], &status, &pipestat);
-	create_pipe(pipefd, &filefd, &status);
+	if (pipestat == 1)
+		create_pipe(pipefd, &status);
+	redir_close(filefd, 0, &status);
 	if (pipestat == 1)
 		id = fork();
-	if (pipestat == 1 && id == -1)
+	if (pipestat == 1 && id == -1) //test return here
 		error_handler(ERR, "", &status);
 	else if (pipestat == 1 && id == 0)
 		return (child_process(argv[2], envp, pipefd));
@@ -96,3 +108,23 @@ int	main(int argc, char *argv[], char *envp[])
 			return (wait_end(id, &status, filefd));
 	}
 }
+
+/* int	main(int argc, char *argv[], char *envp[])
+{
+	pid_t	id;
+	int		pipefd[2];
+	int		filefd;
+	int		status;
+	int		pipestat;
+
+	filefd = inopen(argc, argv[1], &status, &pipestat);
+	redir_close(filefd, 0, &status);
+	redirect(pipefd, argv[4], &status, pipestat);
+	id = fork();
+	if (id == -1)
+		error_handler(ERR, "", &status);
+	else if (id == 0)
+		return (child_process(argv[3], envp, 0));
+	else
+		return (wait_end(id, &status, filefd));
+} */
