@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:48 by mrubina           #+#    #+#             */
-/*   Updated: 2023/08/07 00:37:21 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/03 23:31:18 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void	error_handler(int type, char *name, int *exit_stat)
 	else if (type == NFOUND || type == NFOUNDEX)
 	{
 		print_error(name, ": command not found", 0, type);
+		free(name);
 		*exit_stat = 127;
 	}
 	else if (type == ERR)

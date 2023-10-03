@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/08/14 21:31:40 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/03 23:29:09 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,14 +45,14 @@ char	*extract_path(char *path_str, char *name)
 
 /* cand_path is "/dir1/dir2/file"
 	or "file" */
-char	*find_path(char *fpath, char *envp[], int *status)
+char	*find_path(char **fpath, char *envp[], int *status)
 {
 	int		n;
 	int		i;
 	char	*path_str;
 
-	if (access(fpath, X_OK) == 0 && fpath[0] == '.' && fpath[1] == '/')
-		return (fpath);
+	if (access(*fpath, X_OK) == 0 && (*fpath)[0] == '.' && (*fpath)[1] == '/')
+		return (*fpath);
 	n = 1;
 	i = 0;
 	while (envp && envp[i] != NULL && n != 0)
@@ -62,14 +62,16 @@ char	*find_path(char *fpath, char *envp[], int *status)
 			i++;
 	}
 	if (envp && envp[i] != NULL && n == 0)
-		path_str = extract_path(&((envp[i])[5]), fpath);
+		path_str = extract_path(&((envp[i])[5]), *fpath);
 	else
-		path_str = extract_path(NULL, fpath);
+		path_str = extract_path(NULL, *fpath);
 	if (path_str == NULL)
 		error_handler(NULLPATH, path_str, status);
 	if ((access(path_str, X_OK) == -1 && errno == EACCES))
 		error_handler(EACCES1, path_str, status);
 	if (path_str != NULL && ft_strchr(path_str, '/') == 0)
-		error_handler(NFOUNDEX, path_str, status);
+		{
+			free_arr1(fpath);
+			error_handler(NFOUNDEX, path_str, status);}
 	return (path_str);
 }

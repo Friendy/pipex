@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 18:19:40 by mrubina           #+#    #+#             */
-/*   Updated: 2023/10/03 16:51:19 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/03 23:28:40 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,12 @@
 # define NORM 1
 # define INPUT -1
 
-char	*find_path(char *cand_path, char *envp[], int *status);
+char	*find_path(char **cand_path, char *envp[], int *status);
 char	**get_args(char *arg_str);
 char	*replace_char(char *str, char *str_end, char old_c, char new_c);
 void	replace_by_map(char *str, char *map, char c);
 void	free_arr(char **arr);
+void	free_arr1(char **arr);
 void	error_handler(int type, char *name, int *exit_stat);
 char	*extract_path(char *path_str, char *name);
 int		inopen(char *name, int *status, int *pipestat);

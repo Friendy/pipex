@@ -4,7 +4,8 @@ SRCS = pipex.c
 SRCS_B = pipex_bonus.c heredoc.c
 LIBFT_A = libft/libft.a
 #FLAGS = -Werror -Wall -Wextra
-#ASFLAG = -fsanitize=address
+#ASFLAG = -fsanitize=leak
+LFLAG = -LLeakSanitizer -llsan -lc++
 OBJS = $(SRCS:.c=.o)
 OBJS_SHARED = $(SRCS_SHARED:.c=.o)
 OBJS_B = $(SRCS_B:.c=.o)
@@ -12,13 +13,13 @@ OBJS_B = $(SRCS_B:.c=.o)
 all:$(NAME)
 
 $(NAME): $(LIBFT_A) $(OBJS_SHARED) $(OBJS)
-	cc -o $(NAME) $(ASFLAG) $(OBJS_SHARED) $(OBJS) -Llibft -lft
+	cc -o $(NAME) $(ASFLAG) $(OBJS_SHARED) $(OBJS) -Llibft -lft $(LFLAG)
 
 bonus: .bonus
 
 .bonus: $(LIBFT_A) $(OBJS_SHARED) $(OBJS_B)
 	@touch .bonus
-	cc -o $(NAME) $(ASFLAG) $(OBJS_SHARED) $(OBJS_B) -Llibft -lft
+	cc -o $(NAME) $(ASFLAG) $(OBJS_SHARED) $(OBJS_B) -Llibft -lft $(LFLAG)
 
 $(OBJS_SHARED):
 	cc $(FLAGS) -c $(ASFLAG) $(SRCS_SHARED)

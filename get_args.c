@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/05/20 21:28:52 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/03 23:03:25 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,5 +97,6 @@ char	**get_args(char *arg_s)
 		return (args);
 	}
 	args = split_plus(arg_s);
+	//dprintf(2, "args2 arr%p\n", args);
 	return (args);
 }

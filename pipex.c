@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:48 by mrubina           #+#    #+#             */
-/*   Updated: 2023/10/03 16:34:11 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/03 23:24:14 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,13 +59,12 @@ static int	create_child(char *cmd, char *envp[], int *pipefd, pid_t *id)
 	if (*id == 0)
 	{
 		cmd_args = get_args(cmd);
-		cmd_path = find_path(*cmd_args, envp, &status);
+		cmd_path = find_path(cmd_args, envp, &status);
 		if (pipefd != NULL)
 		{
 			if (close(pipefd[0]) == -1 || dup2(pipefd[1], 1) == -1)
 				error_handler(ERR, "", &status);
 		}
-		//dprintf(2, "before exec%i\n", *id);
 		if (execve(cmd_path, cmd_args, envp) == -1)
 			error_handler(NFOUND, cmd_path, &status);
 	}

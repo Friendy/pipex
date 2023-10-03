@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/08/14 22:25:33 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/03 23:28:56 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,22 @@ void	free_arr(char **arr)
 	if (arr != NULL)
 	{
 		i = arr;
+		while (*i != NULL)
+		{
+			free(*i);
+			i++;
+		}
+		free(arr);
+	}
+}
+
+void	free_arr1(char **arr)
+{
+	char	**i;
+
+	if (arr != NULL)
+	{
+		i = arr + 1;
 		while (*i != NULL)
 		{
 			free(*i);
