@@ -6,13 +6,14 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/08/14 21:31:44 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/02 20:45:34 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
 //open input file
+//pipestat 0 means error but we should continue
 int	inopen(int argc, char *name, int *status, int *pipestat)
 {
 	int	fd;

@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:48 by mrubina           #+#    #+#             */
-/*   Updated: 2023/08/16 22:58:53 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/03 15:56:30 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ static void	redirect1(int *p, int *pipefd, int *status, int pipestat)
 	}
 }
 
-static int	child_process(char *cmd, char *envp[], int *pipefd)
+/* static int	create_child(char *cmd, char *envp[], int *pipefd)
 {
 	char	**cmd_args;
 	char	*cmd_path;
@@ -75,19 +75,27 @@ static int	child_process(char *cmd, char *envp[], int *pipefd)
 	if (execve(cmd_path, cmd_args, envp) == -1)
 		error_handler(NFOUND, cmd_path, &status);
 	return (status);
-}
+} */
 
 //wait till the last child returns and close outfile
-static int	wait_end(int *id, int *pipestat, int *status, int fd)
+static int	wait_end(int *id, int *pipestat, int *status, int argc)
 {
 	int	i;
+	int flag;
 
 	i = 0;
+	flag = WNOHANG;
+	//dprintf(2, "my id%i\n", id[0]);
 	if (pipestat[0] == HERE_DOC)
-		i = 1;
-	while (i <= pipestat[1] - 1)
+		i = pipestat[0];
+	//exit(0);
+	//if (pipestat[1] == argc - 4)
+		i = pipestat[1];
+	while (i <= argc - 4)
 	{
-		if (waitpid(id[i], status, 0) == -1)
+		if (i == argc - 4)
+			flag = 0;
+		if (waitpid(id[i], status, flag) == -1)
 			error_handler(ERR, "", status);
 		i++;
 	}
@@ -106,7 +114,7 @@ void check_args(int argc, char *arg1, int *pipestat, int *status)
 		pipestat[0] = HERE_DOC;
 	else
 		pipestat[0] = NORM;
-	pipestat[1] = argc - 3;
+	pipestat[1] = 0;
 }
 
 // 0 shoul go into pipe
@@ -129,8 +137,34 @@ void	here_doc(int *pipestat, int *pipefd, char *lm, int ind, int *status)
 
 }
 
+static int	create_child(char *cmd, char *envp[], int *pipefd, pid_t *id)
+{
+	char	**cmd_args;
+	char	*cmd_path;
+	int		status;
+
+	status = 0;
+	*id = fork();
+	if (*id == -1) //test return here
+		error_handler(ERR, "", &status);
+	if (*id == 0)
+	{
+		cmd_args = get_args(cmd);
+		cmd_path = find_path(*cmd_args, envp, &status);
+		if (pipefd != NULL)
+		{
+			if (close(pipefd[0]) == -1 || dup2(pipefd[1], 1) == -1)
+				error_handler(ERR, "", &status);
+		}
+		if (execve(cmd_path, cmd_args, envp) == -1)
+			error_handler(NFOUND, cmd_path, &status);
+	}
+	return (status);
+}
+
+
 //in case of child process main should return
-int onefork(char *cmd, char *envp[], int *status, int *pipefd)
+/* int onefork(char *cmd, char *envp[], int *status, int *pipefd)
 {
 	pid_t	id;
 	//int		pipefd[2];
@@ -141,49 +175,89 @@ int onefork(char *cmd, char *envp[], int *status, int *pipefd)
 	if (id == -1)
 		error_handler(ERR, "", status);
 	else if (id == 0)
-		return (child_process(cmd, envp, pipefd)); //returns child process status , -1 if unsuccesssful
+		return (create_child(cmd, envp, pipefd)); //returns child process status , -1 if unsuccesssful
 	return (id);
-}
+} */
 
 //[] [] []
 //[] [] []
 //
 /*
-pipestat = argc - 3 - number of processes
+pipestat[1] = argc - 3 - number of processes
 argc - 4 - number of pipes
-pipestat -
+pipestat[0] - here_doc
 
 with here_doc write into pipe directly [1] (copy [1], 0)
 
  */
-int	main(int argc, char *argv[], char *envp[])
+/* int	main(int argc, char *argv[], char *envp[])
 {
-	pid_t	id[argc - 3];
-	int		fds[(argc - 4)*2 + 2];
+	pid_t	*id;
+	int		*fds;
 	int		status;
 	int		pipestat[2];
 	int		i;
 
 	i = 0;
 	check_args(argc, argv[1], pipestat, &status);
+	id = malloc(sizeof(int) * argc - 3);
+	fds = malloc(sizeof(int) * ((argc - 4)*2 + 2));
+	//fds = malloc(sizeof(int) * 4);
+	fds[(argc - 4)*2] = inopen(argv[1], &status, pipestat);
+	//fds[2] = inopen(argv[1], &status, pipestat);
+	redir_close(fds[(argc - 4)*2], 0, &status);
+	//if (pipestat[1] == argc - 4)
+		i = pipestat[1];
+	//redir_close(fds[2], 0, &status);
+	while (i <= argc - 5)
+	{
+		//create_pipe(&fds[0], &status);
+		create_pipe(&fds[2 * i], &status);
+		create_child(argv[i + 2], envp, &fds[2*i], &id[i]);
+		//create_child(argv[i + 2], envp, &fds[0], &id[i]);
+		//here_doc(pipestat, &fds[2 * i], argv[2], i, &status);
+		//if (close(fds[1]) == -1)
+		if (close(fds[2 * i + 1]) == -1)
+			error_handler(ERR, "", &status);
+		redir_close(fds[2 * i], 0, &status);
+		//redir_close(fds[0], 0, &status);
+		i++;
+	}
+	fds[(argc - 4)*2 + 1] = outopen(argv[argc - 1], &status);
+	//fds[3] = outopen(argv[argc - 1], &status);
+	redir_close(fds[(argc - 4)*2 + 1], 1, &status);
+	//redir_close(fds[3], 1, &status);
+	create_child(argv[i + 2], envp, NULL, &id[argc - 4]);
+	return (wait_end(id, pipestat, &status, argc));
+	//return (wait_end(id, pipestat, &status, fds[3]));
+} */
+
+int	main(int argc, char *argv[], char *envp[])
+{
+	pid_t	*id;
+	int		*fds;
+	int		status;
+	int		pipestat[2];
+	int		i;
+
+	i = 0;
+	check_args(argc, argv[1], pipestat, &status);
+	id = malloc(sizeof(int) * argc - 3);
+	fds = malloc(sizeof(int) * ((argc - 4)*2 + 2));
 	fds[(argc - 4)*2] = inopen(argv[1], &status, pipestat);
 	redir_close(fds[(argc - 4)*2], 0, &status);
-	while (i <= pipestat[1] - 2)
+	i = pipestat[1];
+	while (i <= argc - 5)
 	{
 		create_pipe(&fds[2 * i], &status);
-		id[i] = onefork(argv[i + 2], envp, &status, &fds[2*i]);
-		if (id[i] == -1)
-			return (1);
-		//here_doc(pipestat, &fds[2 * i], argv[2], i, &status);
-		if (close(fds[2*i + 1]) == -1)
+		create_child(argv[i + 2], envp, &fds[2*i], &id[i]);
+		if (close(fds[2 * i + 1]) == -1)
 			error_handler(ERR, "", &status);
-		redir_close(fds[2*i], 0, &status);
+		redir_close(fds[2 * i], 0, &status);
 		i++;
 	}
 	fds[(argc - 4)*2 + 1] = outopen(argv[argc - 1], &status);
 	redir_close(fds[(argc - 4)*2 + 1], 1, &status);
-	id[i] = onefork(argv[argc - 2], envp, &status, NULL);
-	if (id[i] == -1)
-		return (1);
-	return (wait_end(id, pipestat, &status, fds[(argc - 4)*2 + 1]));
+	create_child(argv[i + 2], envp, NULL, &id[argc - 4]);
+	return (wait_end(id, pipestat, &status, argc));
 }
