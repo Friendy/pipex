@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 18:19:40 by mrubina           #+#    #+#             */
-/*   Updated: 2023/08/14 22:25:23 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/03 16:31:53 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	replace_by_map(char *str, char *map, char c);
 void	free_arr(char **arr);
 void	error_handler(int type, char *name, int *exit_stat);
 char	*extract_path(char *path_str, char *name);
-int		inopen(int argc, char *name, int *status, int *pipestat);
+int		inopen(char *name, int *status, int *pipestat);
 int		outopen(char *outfile, int *status);
 void	redir_close(int fd, int stdfd, int *status);
 void	free_str(char *s);

@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:48 by mrubina           #+#    #+#             */
-/*   Updated: 2023/10/03 14:23:52 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/03 16:34:11 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,9 @@ int	main(int argc, char *argv[], char *envp[])
 	int		status;
 	int		pipestat;
 
-	filefd = inopen(argc, argv[1], &status, &pipestat);
+	if (argc != 5)
+		error_handler(ARG, "", &status);
+	filefd = inopen(argv[1], &status, &pipestat);
 	if (pipestat == 1)
 		create_pipe(pipefd, &status);
 	redir_close(filefd, 0, &status);

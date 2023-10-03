@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/10/02 20:45:34 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/03 16:32:15 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,12 @@
 
 //open input file
 //pipestat 0 means error but we should continue
-int	inopen(int argc, char *name, int *status, int *pipestat)
+int	inopen(char *name, int *status, int *pipestat)
 {
 	int	fd;
 
 	*status = 0;
 	*pipestat = 1;
-	if (argc != 5)
-		error_handler(ARG, "", status);
 	fd = open(name, O_RDONLY);
 	if (fd < 0)
 	{

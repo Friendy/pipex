@@ -1,10 +1,10 @@
 NAME = pipex
-SRCS_SHARED = find_path.c get_args.c utils.c err_handler.c
-SRCS = pipex.c fds.c
-SRCS_B = pipex_bonus.c fds_bonus.c
+SRCS_SHARED = find_path.c get_args.c utils.c err_handler.c fds.c
+SRCS = pipex.c
+SRCS_B = pipex_bonus.c heredoc.c
 LIBFT_A = libft/libft.a
 #FLAGS = -Werror -Wall -Wextra
-ASFLAG = -fsanitize=address
+#ASFLAG = -fsanitize=address
 OBJS = $(SRCS:.c=.o)
 OBJS_SHARED = $(SRCS_SHARED:.c=.o)
 OBJS_B = $(SRCS_B:.c=.o)
