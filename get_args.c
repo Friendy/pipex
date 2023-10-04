@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/10/03 23:03:25 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/04 17:27:54 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,14 +89,13 @@ char	**get_args(char *arg_s)
 
 	if (arg_s == NULL)
 		return (NULL);
-	if (arg_s && ft_strlen(arg_s) >= 2 && arg_s[0] == '.' && arg_s[1] == '/')
+/* 	if (arg_s && ft_strlen(arg_s) >= 2 && arg_s[0] == '.' && arg_s[1] == '/')
 	{
 		args = malloc(2 * sizeof(char *));
 		args[0] = arg_s;
 		args[1] = NULL;
 		return (args);
-	}
+	} */
 	args = split_plus(arg_s);
-	//dprintf(2, "args2 arr%p\n", args);
 	return (args);
 }

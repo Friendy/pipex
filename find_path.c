@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/10/03 23:29:09 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/04 16:46:09 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,17 @@ char	*find_path(char **fpath, char *envp[], int *status)
 	int		n;
 	int		i;
 	char	*path_str;
+	int		acc;
 
-	if (access(*fpath, X_OK) == 0 && (*fpath)[0] == '.' && (*fpath)[1] == '/')
-		return (*fpath);
+	if ((*fpath)[0] == '.' && (*fpath)[1] == '/')
+	{
+		acc = access(*fpath, X_OK);
+		if (acc == 0)
+			return (*fpath);
+		else if ((acc == -1 && errno == ENOENT))
+			error_handler(ENOENT, *fpath, status);
+		return (NULL);
+	}
 	n = 1;
 	i = 0;
 	while (envp && envp[i] != NULL && n != 0)

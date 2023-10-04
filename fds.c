@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:30 by mrubina           #+#    #+#             */
-/*   Updated: 2023/10/03 16:32:15 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/04 11:44:26 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,13 @@ int	inopen(char *name, int *status, int *pipestat)
 	int	fd;
 
 	*status = 0;
-	*pipestat = 1;
+	*pipestat = 0;
 	fd = open(name, O_RDONLY);
 	if (fd < 0)
 	{
 		error_handler(ENOENT, name, status);
 		fd = open("/dev/null", O_RDONLY);
-		*pipestat = 0;
+		*pipestat = 1;
 	}
 	return (fd);
 }

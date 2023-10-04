@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 22:37:48 by mrubina           #+#    #+#             */
-/*   Updated: 2023/10/03 23:53:32 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/04 12:58:06 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,19 +78,14 @@ static void	redirect1(int *p, int *pipefd, int *status, int pipestat)
 } */
 
 //wait till the last child returns and close outfile
-static int	wait_end(int *id, int *pipestat, int *status, int argc)
+static int	wait_end(int *id, int *flags, int *status, int argc)
 {
 	int	i;
 	int flag;
 
 	i = 0;
 	flag = WNOHANG;
-	//dprintf(2, "my id%i\n", id[0]);
-	//if (pipestat[0] == HERE_DOC)
-	//	i = pipestat[0];
-	//exit(0);
-	//if (pipestat[1] == argc - 4)
-		i = pipestat[1];
+	i = flags[1];
 	while (i <= argc - 4)
 	{
 		if (i == argc - 4)
@@ -114,7 +109,7 @@ static int	wait_end1(int *id, int *status, int fd, int pipestat)
 	return (WEXITSTATUS(*status));
 }
 
-void check_args(int argc, char *arg1, int *pipestat, int *status)
+void check_args(int argc, char *arg1, int *flags, int *status)
 {
 	int len;
 
@@ -123,10 +118,10 @@ void check_args(int argc, char *arg1, int *pipestat, int *status)
 	*status = 0;
 	len = ft_strlen(arg1);
 	if (argc == 6 && len == 8 && ft_strncmp(arg1, "here_doc", len) == 0)
-		pipestat[0] = HERE_DOC;
+		flags[0] = HERE_DOC;
 	else
-		pipestat[0] = NORM;
-	pipestat[1] = 0;
+		flags[0] = NORM;
+	flags[1] = 0;
 	//dprintf(2, "hd%i\n", pipestat[0]);
 }
 
@@ -152,10 +147,7 @@ static int	create_child(char *cmd, char *envp[], int *pipefd, pid_t *id)
 				error_handler(ERR, "", &status);
 		}
 		if (execve(cmd_path, cmd_args, envp) == -1)
-		{
-			//free_arr(cmd_args);
 			error_handler(NFOUND, cmd_path, &status);
-		}
 	}
 	return (status);
 }
@@ -215,7 +207,7 @@ with here_doc write into pipe directly [1] (copy [1], 0)
 	//return (wait_end(id, pipestat, &status, fds[3]));
 } */
 
-int	heredocm(int argc, char *argv[], char *envp[])
+/* int	heredocm(int argc, char *argv[], char *envp[])
 {
 	pid_t	id[2];
 	int		pipefd[2];
@@ -240,44 +232,69 @@ int	heredocm(int argc, char *argv[], char *envp[])
 		error_handler(ERR, "", &status);
  	create_child(argv[4], envp, NULL, &id[1]);
 	return (wait_end1(id, &status, filefd, pipestat));
+} */
+
+
+/* 
+flag0 here_doc or norm
+flag1 file err
+flag2 1 argc or 5
+ */
+void init(pid_t **id, int **fds, int *flags, int argc)
+{
+	if (flags[0] == HERE_DOC)
+	{
+		*id = malloc(sizeof(int) * 2);
+		*fds = malloc(sizeof(int) * 4);
+		flags[2] = 5;
+	}
+	else
+	{
+		*id = malloc(sizeof(int) * (argc - 3));
+		*fds = malloc(sizeof(int) * ((argc - 4)*2 + 2));
+		flags[2] = argc;
+	}
+	
 }
 
 
+
+/* 
+flag0 here_doc
+flag1 input file err
+flag2 1 argc or 5
+ */
 int	main(int argc, char *argv[], char *envp[])
 {
 	pid_t	*id;
 	int		*fds;
 	int		status;
-	int		pipestat[2];
+	int		flags[3];
 	int		i;
 
 	i = 0;
-	check_args(argc, argv[1], pipestat, &status);
-	if (pipestat[0] == HERE_DOC)
-		return (heredocm(argc, argv, envp));
-	//dprintf(2, "hd%i\n", pipestat[0]);
-	id = malloc(sizeof(int) * argc - 3);
-	fds = malloc(sizeof(int) * ((argc - 4)*2 + 2));
-	fds[(argc - 4)*2] = inopen(argv[1], &status, pipestat);
-	redir_close(fds[(argc - 4)*2], 0, &status);
-	i = pipestat[1];
-	//dprintf(2, "my id%i\n", pipestat[0]);
-	while (i <= argc - 5)
+	check_args(argc, argv[1], flags, &status);
+	init(&id, &fds, flags, argc);
+	if (flags[0] == HERE_DOC)
+		heredoc(argv[2], &status, &fds[2], &flags[1]);
+	else
+		fds[(argc - 4)*2] = inopen(argv[1], &status, &flags[1]);
+	redir_close(fds[(flags[2] - 4)*2], 0, &status);
+	i = flags[1];
+	while (i <= flags[2] - 5)
 	{
-		if (pipestat[0] == 1)
-		{
-			//dprintf(2, "my id%i\n", pipestat[0]);
 		create_pipe(&fds[2 * i], &status);
-		create_child(argv[i + 2], envp, &fds[2*i], &id[i]);
+		create_child(argv[i + 2 + flags[0]], envp, &fds[2*i], &id[i]);
 		if (close(fds[2 * i + 1]) == -1)
 			error_handler(ERR, "", &status);
 		redir_close(fds[2 * i], 0, &status);
-		}
-		pipestat[0] = 1;
 		i++;
 	}
-	fds[(argc - 4)*2 + 1] = outopen(argv[argc - 1], &status);
-	redir_close(fds[(argc - 4)*2 + 1], 1, &status);
-	create_child(argv[i + 2], envp, NULL, &id[argc - 4]);
-	return (wait_end(id, pipestat, &status, argc));
+	fds[(flags[2] - 4)*2 + 1] = outopen(argv[argc - 1], &status);
+	redir_close(fds[(flags[2] - 4)*2 + 1], 1, &status);
+	create_child(argv[i + 2 + flags[0]], envp, NULL, &id[flags[2] - 4]);
+	wait_end(id, flags, &status, flags[2]);
+	free(id);
+	free(fds);
+	return (WEXITSTATUS(status));
 }

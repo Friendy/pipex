@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/10 22:04:43 by mrubina           #+#    #+#             */
-/*   Updated: 2023/10/03 21:07:15 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/04 02:03:46 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,17 +103,25 @@ static int	stdintofd(char *dlm, int filefd)
 	return (0);
 }
 
-void	heredoc(char *dlm, int *status)
+void	heredoc(char *dlm, int *status, int *fd, int *pipestat)
 {
-	int	fd;
+	int	tfd;
 
 	if (access("tmp", F_OK) == 0)
 		unlink("tmp");
-	fd = open("tmp", O_CREAT | O_RDWR, 0644);
-	if (fd >= 0)
+	tfd = open("tmp", O_CREAT | O_RDWR, 0644);
+	if (tfd >= 0)
 	{
-		if (stdintofd(dlm, fd) == 1)
+		if (stdintofd(dlm, tfd) == 1)
 			error_handler(ENOENT, "tmp", status);//!!!!
-		close(fd);
+		close(tfd);
 	}
+	*fd = inopen("tmp", status, pipestat);
 }
+
+/* void	heredoc(char *dlm, int *status, int *fd)
+{
+ if (stdintofd(dlm, *fd) == 1)
+	error_handler(ENOENT, "tmp", status);//!!!!
+
+} */

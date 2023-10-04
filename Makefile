@@ -4,8 +4,8 @@ SRCS = pipex.c
 SRCS_B = pipex_bonus.c heredoc.c
 LIBFT_A = libft/libft.a
 #FLAGS = -Werror -Wall -Wextra
-#ASFLAG = -fsanitize=leak
-LFLAG = -LLeakSanitizer -llsan -lc++
+#ASFLAG = -fsanitize=address
+#LFLAG = -LLeakSanitizer -llsan -lc++
 OBJS = $(SRCS:.c=.o)
 OBJS_SHARED = $(SRCS_SHARED:.c=.o)
 OBJS_B = $(SRCS_B:.c=.o)

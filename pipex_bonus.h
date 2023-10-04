@@ -6,7 +6,7 @@
 /*   By: mrubina <mrubina@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 18:19:40 by mrubina           #+#    #+#             */
-/*   Updated: 2023/10/03 23:28:40 by mrubina          ###   ########.fr       */
+/*   Updated: 2023/10/04 02:23:15 by mrubina          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@
 # define EACCES1 14
 # define NULLPATH 15
 
-# define HERE_DOC -10
-# define NORM 1
+# define HERE_DOC 1
+# define NORM 0
 # define INPUT -1
 
 char	*find_path(char **cand_path, char *envp[], int *status);
@@ -47,5 +47,6 @@ int		inopen(char *name, int *status, int *pipestat);
 int		outopen(char *outfile, int *status);
 void	redir_close(int fd, int stdfd, int *status);
 void	free_str(char *s);
-void	heredoc(char *dlm, int *status);
+//void	heredoc(char *dlm, int *status);
+void	heredoc(char *dlm, int *status, int *fd, int *pipestat);
 #endif
